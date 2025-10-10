@@ -1,0 +1,47 @@
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.4rem 1rem;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+}
+
+.brand-title {
+  font-weight: 600;
+  color: #004085;
+}
+
+.brand-subtitle {
+  font-size: 0.8rem;
+}
+
+.search-box {
+  max-width: 350px;
+}
+
+.bounce-animation {
+  animation: bounce 0.7s ease;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+  60% { transform: translateY(-4px); }
+}
+
+.dropdown-menu {
+  border-radius: 0.5rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f5ff;
+  color: #0d6efd;
+}
+
+.fixed-top {
+  z-index: 1030;
+}

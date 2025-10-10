@@ -1,0 +1,101 @@
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
+  animation: fadeIn 1s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.login-form {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  animation: slideUp 0.8s ease-out;
+}
+.login-form h2 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+.login-form .input-group {
+  margin-bottom: 1.2rem;
+}
+.login-form .input-group label {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: #0d47a1;
+  font-size: 0.9rem;
+}
+.login-form .input-group input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #90caf9;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: box-shadow 0.3s;
+}
+.login-form .input-group input:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
+}
+.login-form button {
+  width: 100%;
+  padding: 0.8rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.login-form button:hover {
+  background: #1565c0;
+}
+.login-form button:disabled {
+  background: #90caf9;
+  cursor: not-allowed;
+}
+.login-form .signup-cta {
+  margin-top: 0.8rem;
+  text-align: center;
+}
+.login-form .signup-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+.login-form .signup-link:hover {
+  text-decoration: underline;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

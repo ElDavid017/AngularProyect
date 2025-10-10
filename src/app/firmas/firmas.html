@@ -1,0 +1,72 @@
+<div class="container">
+  <h1>Visualización de Firmas</h1>
+
+  <!-- Selector de tipo de búsqueda -->
+  <label for="tipoBusqueda">Selecciona tipo de búsqueda:</label>
+  <select id="tipoBusqueda" [(ngModel)]="tipoBusqueda" (change)="toggleEstado()">
+    <option value="firmas_fecha">Buscar firmas por fecha</option>
+    <option value="firmas_caducar">Firmas por caducar</option>
+  </select>
+
+  <!-- Fechas -->
+  <label for="fecha_inicio">Ingresa la fecha de inicio:</label>
+  <input type="date" id="fecha_inicio" [(ngModel)]="fechaInicio" required />
+
+  <label for="fecha_fin">Ingresa la fecha de fin:</label>
+  <input type="date" id="fecha_fin" [(ngModel)]="fechaFin" required />
+
+  <!-- Filtro Estado -->
+  <div id="filtroEstado" [style.display]="mostrarEstado ? 'block' : 'none'" class="margin-bottom">
+    <label for="estado">Estado de la firma:</label>
+    <select id="estado" [(ngModel)]="estado">
+      <option value="Todos">Todos</option>
+      <option value="Vigente">Vigente</option>
+      <option value="Vencida">Vencida</option>
+    </select>
+  </div>
+
+  <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+    <button (click)="buscar()">Ver registros</button>
+    <button id="btnExportar" class="btn btn-success" (click)="exportarExcel()">
+      📤 Exportar a Excel
+    </button>
+  </div>
+
+  <!-- Cargando Spinner -->
+  <div id="loading" class="loading" [style.display]="loading ? 'block' : 'none'">Cargando...</div>
+
+  <!-- Resultados -->
+  <div id="resultados" class="result">
+    <div class="registro" *ngFor="let firma of firmas">
+      <!-- Para firmas_fecha -->
+      <ng-container *ngIf="tipoBusqueda === 'firmas_fecha'">
+        <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
+        <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
+        <p><strong>Tipo Persona:</strong> {{firma.tipo_persona || '—'}}</p>
+        <p><strong>Hora Firma:</strong> {{formatearFechaHora(firma.fecha_registro)}}</p>
+        <p><strong>Celular:</strong> {{firma.celular || '—'}}</p>
+        <p><strong>Duración Firma:</strong> {{firma.duracion_firma || '—'}}</p>
+        <p><strong>Código Distribuidor:</strong> {{firma.codidgo_distribuidor || '—'}}</p>
+        <p><strong>Distribuidor:</strong> {{firma.distribuidor || '—'}}</p>
+        <p><strong>Periodo Registro:</strong> {{firma.periodo_registro || '—'}}</p>
+      </ng-container>
+
+      <!-- Para firmas_caducar -->
+      <ng-container *ngIf="tipoBusqueda === 'firmas_caducar'">
+        <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
+        <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
+        <p><strong>Inicio Firma:</strong> {{formatearFechaHora(firma.Inicio)}}</p>
+        <p><strong>Duración Firma:</strong> {{firma.duracion || '—'}}</p>
+        <p><strong>Fecha de Caducidad:</strong> {{formatearFechaHora(firma.CADUCIDAD)}}</p>
+        <p><strong>Estado:</strong> {{firma.Estado || '—'}}</p>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Paginación -->
+  <div id="paginacion" class="paginacion" [style.display]="mostrarPaginacion ? 'flex' : 'none'">
+    <button (click)="cambiarPagina(-1)" [disabled]="pagina === 1">Anterior</button>
+    <span>{{pagina}}</span> / <span>{{totalPaginas}}</span>
+    <button (click)="cambiarPagina(1)" [disabled]="pagina === totalPaginas">Siguiente</button>
+  </div>
+</div>

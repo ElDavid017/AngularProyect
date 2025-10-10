@@ -1,0 +1,114 @@
+/* Fondo general */
+:host {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom right, #e0f0ff, #f8fbff);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal del formulario */
+.form-container {
+  background-color: #0036cc;
+  backdrop-filter: blur(8px);
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+/* Título */
+.form-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.form-subtitle {
+  color: #6c757d;
+  font-size: 0.95rem;
+  margin-bottom: 25px;
+}
+
+/* Inputs */
+input {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #d1d1d1;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: border 0.2s ease;
+}
+
+input:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #fff;
+}
+
+/* Grid para inputs en línea */
+.input-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 15px;
+}
+
+/* Botones */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: linear-gradient(135deg, #0048ff, #336dff);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 72, 255, 0.15);
+  transition: all 0.25s ease;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #0036cc, #2f5de2);
+  box-shadow: 0 6px 18px rgba(0, 72, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 72, 255, 0.2);
+}
+
+button:disabled {
+  background: #a0c8ff;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+
+button.cancel {
+  background-color: transparent;
+  color: #555;
+}
+
+/* Responsive ajustes */
+@media (max-width: 600px) {
+  .form-container {
+    padding: 25px 20px;
+  }
+
+  .form-title {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,72 @@
+<div class="signup-page">
+	<div class="signup-card">
+		<div class="signup-hero">
+			<h2>Regístrate</h2>
+			<p>Únete para acceder a las funcionalidades del sistema. Completa los datos solicitados.</p>
+		</div>
+
+		<div class="signup-form-wrap">
+			<form class="signup-form" [formGroup]="formSigup" (ngSubmit)="onSubmit()" novalidate>
+				<div class="field">
+					<label for="usuid">Identificación (USUIDENTIFICACION)</label>
+					<input id="usuid" formControlName="usuid" placeholder="Ej: 1234567890" aria-label="Identificación" [attr.aria-invalid]="f['usuid'].invalid && (f['usuid'].touched || f['usuid'].dirty)" />
+					<div class="error" *ngIf="f['usuid'].touched && f['usuid'].invalid">Identificación obligatoria</div>
+				</div>
+
+				<div class="field">
+					<label for="usuclave">Contraseña</label>
+					<input id="usuclave" type="password" formControlName="usuclave" placeholder="Mínimo 4 caracteres" aria-label="Contraseña" [attr.aria-invalid]="f['usuclave'].invalid && (f['usuclave'].touched || f['usuclave'].dirty)" />
+					<div class="error" *ngIf="f['usuclave'].touched && f['usuclave'].invalid">La contraseña es obligatoria (min 4 caracteres)</div>
+				</div>
+
+				<div class="field">
+					<label for="usuruci">RUC (USURUCI)</label>
+					<input id="usuruci" formControlName="usuruci" placeholder="RUC de la empresa" aria-label="RUC" />
+				</div>
+
+				<div class="field">
+					<label for="usuapellido">Apellido</label>
+					<input id="usuapellido" formControlName="usuapellido" placeholder="Apellido" aria-label="Apellido" [attr.aria-invalid]="f['usuapellido'].invalid && (f['usuapellido'].touched || f['usuapellido'].dirty)" />
+				</div>
+
+				<div class="field">
+					<label for="usunombre">Nombre</label>
+					<input id="usunombre" formControlName="usunombre" placeholder="Nombre" aria-label="Nombre" [attr.aria-invalid]="f['usunombre'].invalid && (f['usunombre'].touched || f['usunombre'].dirty)" />
+				</div>
+
+				<div class="field full">
+					<label for="correo">Correo</label>
+					<input id="correo" type="email" formControlName="correo" placeholder="correo@ejemplo.com" aria-label="Correo" [attr.aria-invalid]="f['correo'].invalid && (f['correo'].touched || f['correo'].dirty)" />
+					<div class="error" *ngIf="f['correo'].touched && f['correo'].invalid">Correo inválido</div>
+				</div>
+
+				<div class="field">
+					<label for="telefono">Teléfono</label>
+					<input id="telefono" type="tel" formControlName="telefono" placeholder="0991234567" aria-label="Teléfono" [attr.aria-invalid]="f['telefono'].invalid && (f['telefono'].touched || f['telefono'].dirty)" />
+					<div class="error" *ngIf="f['telefono'].touched && f['telefono'].invalid">Teléfono debe tener 10 dígitos</div>
+				</div>
+
+				<div class="field">
+					<label for="empresa">Empresa</label>
+					<input id="empresa" formControlName="empresa" placeholder="Nombre de la empresa" aria-label="Empresa" />
+				</div>
+
+				<div class="row-actions">
+					<button type="submit" class="btn primary" [disabled]="submitting">{{ submitting ? 'Guardando...' : 'Guardar registro' }}</button>
+					<a class="btn secondary" href="/login">Cancelar</a>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<!-- Dialog modal -->
+<div class="dialog-backdrop" *ngIf="showDialog">
+	<div class="dialog">
+		<h3>Estado del registro</h3>
+		<p>{{ dialogMessage }}</p>
+		<div class="dialog-actions">
+			<button class="btn primary" (click)="closeDialog()">Aceptar</button>
+		</div>
+	</div>
+</div>

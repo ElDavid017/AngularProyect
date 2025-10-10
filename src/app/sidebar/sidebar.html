@@ -1,0 +1,57 @@
+<div class="sidebar" [class.open]="isOpen">
+  <!-- Sección de perfil -->
+  <div class="profile-section">
+    <div class="profile-avatar">
+      <i class="fas fa-user-circle"></i>
+    </div>
+    <div class="welcome-text">Bienvenido</div>
+    <div class="user-name">{{ currentUser?.nombreCompleto || currentUser?.USUAPELLIDO || 'Usuario' }}</div>
+  </div>
+
+  <!-- Navegación principal -->
+  <nav>
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="/amelia" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-robot"></i>
+          AMELIA
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/firmas" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-file-signature"></i>
+          FIRMAS
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/orel" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-file-alt"></i>
+          OREL
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/imprenta" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-print"></i>
+          IMPRENTA ELECTRÓNICA
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/firmador" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-signature"></i>
+          FIRMADOR
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a routerLink="/plantillas" routerLinkActive="active" class="nav-link">
+          <i class="fas fa-file-template"></i>
+          PLANTILLAS
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
