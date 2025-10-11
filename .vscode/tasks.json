@@ -1,42 +1,28 @@
 {
-  // For more information, visit: https://go.microsoft.com/fwlink/?LinkId=733558
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "npm: dev:all",
+      "type": "shell",
+      "command": "npm run dev:all",
+      "problemMatcher": [],
+      "isBackground": false,
+      "presentation": { "reveal": "always", "focus": false, "panel": "shared" }
+    },
+    {
+      "label": "npm: start (frontend)",
       "type": "npm",
       "script": "start",
       "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
+      "problemMatcher": []
     },
     {
-      "type": "npm",
-      "script": "test",
-      "isBackground": true,
-      "problemMatcher": {
-        "owner": "typescript",
-        "pattern": "$tsc",
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": {
-            "regexp": "(.*?)"
-          },
-          "endsPattern": {
-            "regexp": "bundle generation complete"
-          }
-        }
-      }
+      "label": "npm: dev:backend:local",
+      "type": "shell",
+      "command": "npm run dev:backend:local",
+      "problemMatcher": [],
+      "isBackground": false,
+      "presentation": { "reveal": "always", "panel": "shared" }
     }
   ]
 }

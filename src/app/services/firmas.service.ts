@@ -1,43 +1,56 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FirmasService {
-  private localUrl = 'http://localhost:3000';
-  private remoteUrl = 'http://localhost:3001';
+  private apiPrefix = '/api';
 
   constructor(private http: HttpClient) {}
 
-  getFirmasPorFecha(fechaInicio: string, fechaFin: string, pagina: number, porPagina: number): Observable<any> {
-    // Usar la base remota para buscar por fecha
-    return this.http.get(`${this.remoteUrl}/firmas`, {
-      params: {
-        fecha_inicio: fechaInicio,
-        fecha_fin: fechaFin,
-        pagina: pagina.toString(),
-        por_pagina: porPagina.toString()
-      }
-    });
+  // Buscar registros por fecha (uso general). Devuelve Observable<any> (JSON array)
+  buscarRegistrosPorFecha(fechaInicio: string, fechaFin: string): Observable<any> {
+    const body = {
+      fecha_inicio: this.toIsoDate(fechaInicio), // convierte dd/mm/yyyy o ISO según tu UI
+      fecha_fin: this.toIsoDate(fechaFin)
+    };
+    return this.http.post<any>(`${this.apiPrefix}/obtener-registros`, body);
   }
 
-  getFirmasEstado(fechaInicio: string, fechaFin: string, estado: string): Observable<any> {
-    // Usar la base local para buscar por caducar
-    return this.http.get(`${this.localUrl}/firmas-estado`, {
-      params: {
-        fecha_inicio: fechaInicio,
-        fecha_fin: fechaFin,
-        estado
-      }
-    });
+  // Alternativa específica si quieres usar el endpoint de firmas-factura
+  buscarFirmasFacturaPorFecha(fechaInicio: string, fechaFin: string): Observable<any> {
+    const body = {
+      fecha_inicio: this.toIsoDate(fechaInicio),
+      fecha_fin: this.toIsoDate(fechaFin)
+    };
+    return this.http.post<any>(`${this.apiPrefix}/obtener-firmas-factura`, body);
   }
 
-  exportarExcel(fechaInicio: string, fechaFin: string, tipo: string): string {
-    // Exportar según el tipo de búsqueda
-    const url = tipo === 'firmas_fecha' ? this.remoteUrl : this.localUrl;
-    return `${url}/exportar-excel?fecha_inicio=${fechaInicio}&fecha_fin=${fechaFin}&tipo=${tipo}`;
+  // Exportar Excel: llama al mismo endpoint con generarExcel = true y devuelve un Blob
+  exportarRegistrosExcel(fechaInicio: string, fechaFin: string): Observable<Blob> {
+    const body = {
+      fecha_inicio: this.toIsoDate(fechaInicio),
+      fecha_fin: this.toIsoDate(fechaFin),
+      generarExcel: true
+    };
+    return this.http.post(`${this.apiPrefix}/obtener-registros`, body, { responseType: 'blob' });
+  }
+
+  // Helper: convertir dd/mm/yyyy -> YYYY-MM-DD si tu UI entrega dd/mm/yyyy
+  private toIsoDate(value: string): string {
+    // Si ya recibes YYYY-MM-DD, devolvemos tal cual
+    if (!value) return value;
+    // Si es dd/mm/yyyy -> convertir
+    const parts = value.split('/');
+    if (parts.length === 3) {
+      const dd = parts[0].padStart(2, '0');
+      const mm = parts[1].padStart(2, '0');
+      const yyyy = parts[2];
+      return `${yyyy}-${mm}-${dd}`;
+    }
+    // fallback
+    return value;
   }
 }

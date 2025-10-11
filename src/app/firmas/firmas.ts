@@ -49,51 +49,114 @@ export class Firmas implements OnInit {
     this.firmas = [];
     this.mostrarPaginacion = false;
 
+    const normalize = (resp: any): { rows: any[]; totalPages?: number } => {
+      // Backend real devuelve: [ { '0': {...}, '1': {...}, ... }, metadata ]
+      if (!resp) return { rows: [], totalPages: 1 };
+
+      // Si es array: [ obj_con_claves_numericas, metadata ]
+      if (Array.isArray(resp) && resp.length > 0) {
+        const first = resp[0];
+        
+        // Caso: primer elemento es objeto con claves numéricas
+        if (first && typeof first === 'object' && !Array.isArray(first)) {
+          const numericKeys = Object.keys(first).filter(k => /^\d+$/.test(k)).sort((a,b)=>Number(a)-Number(b));
+          if (numericKeys.length > 0) {
+            const rows = numericKeys.map(k => first[k]);
+            let totalPages: number | undefined;
+            // buscar totalPages en el primer elemento o en el segundo (metadata)
+            if ('totalPages' in first) totalPages = first.totalPages;
+            if (resp[1] && typeof resp[1] === 'object' && 'totalPages' in resp[1]) {
+              totalPages = totalPages ?? resp[1].totalPages;
+            }
+            return { rows, totalPages };
+          }
+        }
+
+        // Caso: [ [ {...}, {...} ], meta ] (array de array)
+        if (Array.isArray(first)) {
+          const totalPages = resp[1]?.totalPages;
+          return { rows: first, totalPages };
+        }
+
+        // Caso: array plano [ {...}, {...} ]
+        if (first && typeof first === 'object') {
+          return { rows: resp };
+        }
+      }
+
+      // Si es objeto simple (no array)
+      if (typeof resp === 'object' && !Array.isArray(resp)) {
+        // { firmas: [...], totalPaginas }
+        if (Array.isArray(resp.firmas)) {
+          return { rows: resp.firmas, totalPages: resp.totalPaginas };
+        }
+
+        // Objeto con claves numéricas: { '0': {...}, '1': {...} }
+        const numericKeys = Object.keys(resp).filter(k => /^\d+$/.test(k)).sort((a,b)=>Number(a)-Number(b));
+        if (numericKeys.length > 0) {
+          const rows = numericKeys.map(k => resp[k]);
+          return { rows, totalPages: resp.totalPages };
+        }
+      }
+
+      // Fallback: vacío
+      return { rows: [], totalPages: 1 };
+    };
+
     if (this.tipoBusqueda === 'firmas_fecha') {
-      this.firmasService.getFirmasPorFecha(
-        this.fechaInicio,
-        this.fechaFin,
-        this.pagina,
-        this.porPagina
-      ).subscribe({
-        next: (response) => {
-          this.firmas = response.firmas || [];
-          this.totalPaginas = response.totalPaginas || 1;
-          this.mostrarPaginacion = this.totalPaginas > 1;
-        },
-        error: (error) => {
-          console.error('Error al cargar los registros:', error);
-          alert('❌ Error al cargar los registros.');
-        },
-        complete: () => {
-          this.loading = false;
-        }
-      });
+      this.firmasService.buscarRegistrosPorFecha(this.fechaInicio, this.fechaFin)
+        .subscribe({
+          next: (resp: any) => {
+            const { rows, totalPages } = normalize(resp);
+            const total = rows.length || 0;
+            this.totalPaginas = totalPages || Math.max(1, Math.ceil(total / this.porPagina));
+            this.mostrarPaginacion = this.totalPaginas > 1;
+
+            // Si el backend ya paginó, asumimos que `rows` ya es la página; si no, paginamos localmente
+            if (resp && resp.firmas) {
+              this.firmas = rows;
+            } else if (Array.isArray(resp) && Array.isArray(resp[0])) {
+              // caso [rows, meta]
+              this.firmas = rows;
+            } else {
+              const inicio = (this.pagina - 1) * this.porPagina;
+              this.firmas = rows.slice(inicio, inicio + this.porPagina);
+            }
+          },
+          error: (error) => {
+            console.error('Error al cargar los registros:', error);
+            alert('❌ Error al cargar los registros.');
+          },
+          complete: () => {
+            this.loading = false;
+          }
+        });
     } else {
-      this.firmasService.getFirmasEstado(
-        this.fechaInicio,
-        this.fechaFin,
-        this.estado
-      ).subscribe({
-        next: (response) => {
-          this.firmas = response.firmas || [];
-          // Calcular paginación manualmente para firmas_caducar
-          const total = this.firmas.length;
-          this.totalPaginas = Math.ceil(total / this.porPagina) || 1;
-          this.mostrarPaginacion = this.totalPaginas > 1;
-          // Mostrar solo la página actual
-          const inicio = (this.pagina - 1) * this.porPagina;
-          const fin = inicio + this.porPagina;
-          this.firmas = this.firmas.slice(inicio, fin);
-        },
-        error: (error) => {
-          console.error('Error al cargar los registros:', error);
-          alert('❌ Error al cargar los registros.');
-        },
-        complete: () => {
-          this.loading = false;
-        }
-      });
+      // firmas_caducar: usar endpoint equivalente y filtrar si hace falta
+      this.firmasService.buscarRegistrosPorFecha(this.fechaInicio, this.fechaFin)
+        .subscribe({
+          next: (resp: any) => {
+            const { rows, totalPages } = normalize(resp);
+            let filtradas = rows || [];
+            if (this.estado && this.estado !== 'Todos') {
+              filtradas = filtradas.filter((r: any) => (r.estado || '').toString() === this.estado);
+            }
+
+            const total = filtradas.length || 0;
+            this.totalPaginas = totalPages || Math.max(1, Math.ceil(total / this.porPagina));
+            this.mostrarPaginacion = this.totalPaginas > 1;
+
+            const inicio = (this.pagina - 1) * this.porPagina;
+            this.firmas = filtradas.slice(inicio, inicio + this.porPagina);
+          },
+          error: (error) => {
+            console.error('Error al cargar los registros:', error);
+            alert('❌ Error al cargar los registros.');
+          },
+          complete: () => {
+            this.loading = false;
+          }
+        });
     }
   }
 
@@ -125,12 +188,24 @@ export class Firmas implements OnInit {
       return;
     }
 
-    const url = this.firmasService.exportarExcel(
-      this.fechaInicio,
-      this.fechaFin,
-      this.tipoBusqueda
-    );
-    
-    window.location.href = url;
+    // Llamamos al backend por POST y esperamos un Blob (archivo xlsx)
+    this.firmasService.exportarRegistrosExcel(this.fechaInicio, this.fechaFin)
+      .subscribe({
+        next: (blob) => {
+          const filename = `registros_firmas_${this.fechaInicio.replace(/\//g, '-')}_${this.fechaFin.replace(/\//g, '-')}.xlsx`;
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('Error al exportar Excel:', err);
+          alert('❌ Error al generar el Excel.');
+        }
+      });
   }
 }
