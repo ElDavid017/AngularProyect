@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../auth.service';
@@ -25,6 +25,7 @@ import { AuthService } from '../auth.service';
 })
 export class Sidebar {
   @Input() isOpen = false;
+  @Output() closeSidebar = new EventEmitter<void>();
 
   constructor(public auth: AuthService) {}
 
@@ -35,5 +36,10 @@ export class Sidebar {
     } catch (e) {
       return null;
     }
+  }
+
+  /** Cierra el sidebar cuando se hace click en un enlace */
+  onLinkClick() {
+    this.closeSidebar.emit();
   }
 }

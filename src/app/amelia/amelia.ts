@@ -5,16 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-amelia',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="amelia-container">
-      <h1>AMELIA</h1>
-      <p>Plataforma de asistencia virtual</p>
-    </div>
-  `,
-  styles: [`
-    .amelia-container {
-      padding: 20px;
-    }
-  `]
+  templateUrl: './amelia.html',
+  styleUrls: ['./amelia.css']
 })
 export class Amelia {}

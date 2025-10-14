@@ -5,16 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-firmador',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="firmador-container">
-      <h1>FIRMADOR</h1>
-      <p>Sistema de firma digital</p>
-    </div>
-  `,
-  styles: [`
-    .firmador-container {
-      padding: 20px;
-    }
-  `]
+  templateUrl: './firmador.html',
+  styleUrls: ['./firmador.css']
 })
 export class Firmador {}

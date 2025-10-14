@@ -2,19 +2,17 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch dev (backend+frontend)",
+      "name": "Launch Frontend (Angular + Proxy)",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:4200",
       "webRoot": "${workspaceFolder}",
-      "preLaunchTask": "npm: dev:all"
-    },
-    {
-      "name": "Frontend only (ng serve)",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:4200/",
-      "preLaunchTask": "npm: start"
+      "preLaunchTask": "npm: start",
+      "serverReadyAction": {
+        "pattern": "Local:.*http://localhost:4200",
+        "uriFormat": "http://localhost:4200",
+        "action": "openExternally"
+      }
     }
   ]
 }

@@ -1,49 +1,21 @@
-/* ===== Reset y estilo base ===== */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: #e6f0fa;
-  color: #1a1a1a;
-  padding: 20px;
-}
-
 /* ===== Contenedor principal ===== */
 .container {
   max-width: 800px;
+  width: 100%;
   margin: 0 auto;
-  background: #ffffff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 80px 20px 20px;
+  background: white;
 }
 
-/* Ajustes para el layout responsive */
-@media (min-width: 992px) {
-  .container {
-    margin-left: calc(280px + auto); /* Espacio para el sidebar en desktop */
-    margin-right: 20px;
-    width: calc(100% - 320px); /* Ajustar ancho considerando el sidebar */
-  }
-}
-
-@media (max-width: 991px) {
-  .container {
-    margin: 0 20px;
-    width: calc(100% - 40px);
-  }
-}
-
-/* ===== Título ===== */
-h1 {
+h2 {
   text-align: center;
   color: #0d47a1;
-  margin-bottom: 25px;
-  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+h3 {
+  color: #0d47a1;
+  margin-bottom: 15px;
 }
 
 /* ===== Inputs, select y botones ===== */
@@ -78,6 +50,7 @@ button {
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s;
+  margin-right: 10px;
 }
 
 button:hover {
@@ -156,11 +129,12 @@ button:disabled {
 /* ===== Responsive ===== */
 @media (max-width: 600px) {
   .container {
-    padding: 15px;
+    padding: 80px 15px 15px;
   }
 
   button {
     width: 100%;
+    margin-bottom: 10px;
   }
 
   .paginacion {

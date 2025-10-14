@@ -5,16 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-imprenta',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="imprenta-container">
-      <h1>IMPRENTA ELECTRÓNICA</h1>
-      <p>Sistema de impresión digital</p>
-    </div>
-  `,
-  styles: [`
-    .imprenta-container {
-      padding: 20px;
-    }
-  `]
+  templateUrl: './imprenta.html',
+  styleUrls: ['./imprenta.css']
 })
 export class Imprenta {}

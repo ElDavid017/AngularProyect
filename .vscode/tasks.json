@@ -2,27 +2,24 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "npm: dev:all",
-      "type": "shell",
-      "command": "npm run dev:all",
-      "problemMatcher": [],
-      "isBackground": false,
-      "presentation": { "reveal": "always", "focus": false, "panel": "shared" }
-    },
-    {
-      "label": "npm: start (frontend)",
+      "label": "npm: start",
       "type": "npm",
       "script": "start",
       "isBackground": true,
-      "problemMatcher": []
-    },
-    {
-      "label": "npm: dev:backend:local",
-      "type": "shell",
-      "command": "npm run dev:backend:local",
-      "problemMatcher": [],
-      "isBackground": false,
-      "presentation": { "reveal": "always", "panel": "shared" }
+      "problemMatcher": {
+        "owner": "typescript",
+        "pattern": "$tsc",
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": ".*Local:.*http://localhost:4200.*"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "focus": false,
+        "panel": "shared"
+      }
     }
   ]
 }

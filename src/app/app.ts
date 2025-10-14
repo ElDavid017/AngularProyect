@@ -13,7 +13,7 @@ import { SidebarService } from './services/sidebar.service';
   imports: [CommonModule, RouterOutlet, Navbar, Sidebar],
   template: `
     <app-navbar *ngIf="showNav" (toggle)="onToggleSidebar()"></app-navbar>
-    <app-sidebar *ngIf="showNav && auth.isAuthenticated()" [isOpen]="sidebarOpen"></app-sidebar>
+    <app-sidebar *ngIf="showNav && auth.isAuthenticated()" [isOpen]="sidebarOpen" (closeSidebar)="onCloseSidebar()"></app-sidebar>
     <div class="sidebar-overlay" *ngIf="sidebarOpen && showNav && auth.isAuthenticated()" (click)="onToggleSidebar()"></div>
     <router-outlet></router-outlet>
   `,
@@ -113,6 +113,11 @@ export class App implements OnDestroy {
   /** Método para alternar la visibilidad del sidebar */
   onToggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  /** Método para cerrar el sidebar (llamado desde los enlaces del sidebar) */
+  onCloseSidebar() {
+    this.sidebarOpen = false;
   }
 
   ngOnDestroy(): void {
