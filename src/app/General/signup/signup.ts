@@ -71,7 +71,7 @@ export class Sigup {
         this.showDialog = true;
         this.submitting = false;
       },
-      error: (err) => {
+  error: (err: any) => {
         console.error('Error en registro', err);
         const message = err && err.error && err.error.message ? err.error.message : 'Error del servidor';
         this.dialogMessage = message;

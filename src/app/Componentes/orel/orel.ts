@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { OrelService } from '../services/orel.service';
+import { OrelService } from '../../services/orel.service';
 
 @Component({
   selector: 'app-orel',
@@ -147,7 +147,7 @@ export class Orel {
           this.showConfirmModal = false;
         }, remaining);
       },
-      error: (err) => {
+  error: (err: any) => {
         console.error('Error cargando complemento orel:', err);
         this.pendingDatos = [];
         this.pendingTotalResults = 0;

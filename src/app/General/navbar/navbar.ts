@@ -2,8 +2,8 @@ import { Component, EventEmitter, Output, OnDestroy, AfterViewInit, Inject, PLAT
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AuthService } from '../auth.service';
-import { SidebarService } from '../services/sidebar.service';
+import { AuthService } from '../../auth.service';
+import { SidebarService } from '../../services/sidebar.service';
 
 
 

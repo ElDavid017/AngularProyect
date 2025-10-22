@@ -1,7 +1,7 @@
 import { Component, signal, OnDestroy, OnInit, HostBinding } from '@angular/core';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { Navbar } from './navbar/navbar';
-import { Sidebar } from './sidebar/sidebar';
+import { RouterOutlet, Router, NavigationEnd, RouterModule } from '@angular/router';
+import { Navbar } from './General/navbar/navbar';
+import { Sidebar } from './General/sidebar/sidebar';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './auth.service';
@@ -10,7 +10,7 @@ import { SidebarService } from './services/sidebar.service';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, Navbar, Sidebar],
+  imports: [CommonModule, RouterModule, Navbar, Sidebar],
   template: `
     <app-navbar *ngIf="showNav" (toggle)="onToggleSidebar()"></app-navbar>
     <app-sidebar *ngIf="showNav && auth.isAuthenticated()" [isOpen]="sidebarOpen" (closeSidebar)="onCloseSidebar()"></app-sidebar>

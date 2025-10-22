@@ -10,16 +10,16 @@
  */
 
 import { Routes } from '@angular/router';
-import { Login } from './login/login';
-import { Sigup } from './signup/signup';
-import { Dashboard } from './dashboard/dashboard';
+import { Login } from './General/login/login';
+import { Sigup } from './General/signup/signup';
+import { Dashboard } from './Componentes/dashboard/dashboard';
 import { AuthGuard } from './auth.guard';
-import { Amelia } from './amelia/amelia';
-import { Firmas } from './firmas/firmas';
-import { Orel } from './orel/orel';
-import { Imprenta } from './imprenta/imprenta';
-import { Firmador } from './firmador/firmador';
-import { Plantillas } from './plantillas/plantillas';
+import { Amelia } from './Componentes/amelia/amelia';
+import { Firmas } from './Componentes/firmas/firmas';
+import { Orel } from './Componentes/orel/orel';
+import { Imprenta } from './Componentes/imprenta/imprenta';
+import { Firmador } from './Componentes/firmador/firmador';
+import { Plantillas } from './Componentes/plantillas/plantillas';
 
 
 

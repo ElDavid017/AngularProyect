@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule, NgIf, NgForOf } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PlantillasService } from '../services/plantillas.service';
+import { PlantillasService } from '../../services/plantillas.service';
 
 @Component({
   selector: 'app-plantillas',
@@ -143,7 +143,7 @@ export class Plantillas {
           this.showConfirmModal = false;
         }, remaining);
       },
-      error: (err) => {
+  error: (err: any) => {
         console.error('Error cargando plantillas por caducar:', err);
         this.pendingDatos = [];
         this.pendingTotalResults = 0;
@@ -197,36 +197,73 @@ export class Plantillas {
   }
 
   async exportarExcel() {
-    if (!this.datosCargados || !this.allDatos || this.allDatos.length===0) {
+    if (!this.datosCargados || !this.allDatos || this.allDatos.length === 0) {
       alert('No hay datos para exportar. Carga los datos primero.');
       return;
     }
 
+    // Cabeceras (mismo orden esperado)
     const headers = ['ID','MAC','RUC','NOMBRE','TIPO_PLANTILLA','VENDEDOR','FECHA_ACTIVACION','FECHA_CADUCIDAD','COMENTARIO','TELEFONO','CORREO','ESTADO','CIUDAD','MATRICULADO','GRATIS','TERMINOS','PERMISO','LICENCIA','PRECIO','BANCO','COMPROBANTE','ARCHIVO_PAGO','DOCUMENTO_PAGO','FECHA_COMPROBANTE','NUM_FACTURA','CODIGO_UNICO','CONTADOR_USO','CREATED_AT','UPDATED_AT'];
 
-    const data: any[][] = [];
-    data.push(headers);
-    for (const item of this.allDatos) {
-      const row = headers.map(h => item?.[h] ?? item?.[h.toUpperCase()] ?? item?.[h.toLowerCase()] ?? '');
-      data.push(row);
-    }
+    try {
+      const data: any[][] = [];
+      data.push(headers);
+      const EXCEL_CELL_CHAR_LIMIT = 32767;
+      for (const item of this.allDatos) {
+        // intentar varias claves (sensibilidad a mayúsculas/minúsculas)
+        const row = headers.map(h => {
+          const raw = item?.[h] ?? item?.[h.toUpperCase()] ?? item?.[h.toLowerCase()] ?? '';
+          return this.sanitizeCell(raw, EXCEL_CELL_CHAR_LIMIT);
+        });
+        data.push(row);
+      }
 
-    const XLSX = await import('xlsx');
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'PlantillasPorCaducar');
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/octet-stream' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `plantillas_por_caducar_${this.fechaInicio.replace(/\//g,'-')}_${this.fechaFin.replace(/\//g,'-')}.xlsx`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
+      const mod = await import('xlsx');
+      const XLSX = (mod && (mod as any).default) ? (mod as any).default : mod;
+      if (!XLSX || !XLSX.utils || typeof XLSX.utils.aoa_to_sheet !== 'function') {
+        throw new Error('La librería XLSX no está disponible o le faltan utilidades (XLSX.utils)');
+      }
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'PlantillasPorCaducar');
+      const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([wbout], { type: 'application/octet-stream' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+  const safeFi = (this.fechaInicio ?? '').toString();
+  const safeFf = (this.fechaFin ?? '').toString();
+  a.download = `plantillas_por_caducar_${safeFi.replace(/\//g,'-')}_${safeFf.replace(/\//g,'-')}.xlsx`;
+  a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e: any) {
+      console.error('Error exportando Plantillas a Excel:', e);
+      const msg = e && e.message ? e.message : String(e);
+      this.modalMessage = `❌ Error generando el archivo Excel: ${msg}`;
+      this.modalLoading = false;
+      this.showConfirmModal = true;
+    }
   }
 
   confirmLoad() { this.showConfirmModal = false; }
   cancelLoad() { this.showConfirmModal = false; }
+
+  // Protege valores que excedan el límite por celda de Excel (32.767 chars)
+  private sanitizeCell(val: any, limit = 32767): any {
+    if (val == null) return '';
+    let s: string;
+    if (typeof val === 'string') s = val;
+    else {
+      try { s = String(val); } catch { return val; }
+    }
+    if (s.length > limit) {
+      console.warn(`Valor demasiado largo (${s.length} chars), se truncará a ${limit} chars`);
+      // dejar un indicador claro de truncado
+      return s.slice(0, limit - 32) + ` ... [TRUNCATED ${s.length} chars]`;
+    }
+    return s;
+  }
 }

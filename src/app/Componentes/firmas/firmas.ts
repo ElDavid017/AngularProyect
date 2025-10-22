@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FirmasService } from '../services/firmas.service';
+import { FirmasService } from '../../services/firmas.service';
 
 @Component({
   selector: 'app-firmas',
@@ -264,7 +264,7 @@ export class Firmas implements OnInit {
               this.showConfirmModal = false;
             }, remaining);
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error('Error al obtener firmas vendidas:', err);
             this.pendingFirmas = [];
             this.pendingTotalResults = 0;
@@ -563,7 +563,7 @@ export class Firmas implements OnInit {
                 this.loading = false;
                 onFinish?.();
             },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error al cargar los registros:', error);
             // mostrar error en modal
             this.loading = false;
@@ -598,7 +598,7 @@ export class Firmas implements OnInit {
             this.loading = false;
             onFinish?.();
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error al cargar facturas por fechas:', error);
             this.loading = false;
             this.pendingFirmas = [];
@@ -629,7 +629,7 @@ export class Firmas implements OnInit {
             this.loading = false;
             onFinish?.();
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error al cargar firmas generadas con factura:', error);
             this.loading = false;
             this.pendingFirmas = [];
@@ -660,7 +660,7 @@ export class Firmas implements OnInit {
             this.loading = false;
             onFinish?.();
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Error al cargar distribuidores:', error);
             this.loading = false;
             this.pendingFirmas = [];
@@ -966,7 +966,7 @@ export class Firmas implements OnInit {
             a.remove();
             window.URL.revokeObjectURL(url);
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error('Error al exportar facturas a XLSX:', err);
             this.modalMessage = '❌ Error al generar el Excel de facturas.';
             this.modalLoading = false;

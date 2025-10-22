@@ -157,7 +157,7 @@ export class Imprenta implements OnInit {
             this.cargando = false;
             onFinish?.();
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error(err);
             this.pendingIsPagos = false;
             this.pendingPagosAll = [];
@@ -187,7 +187,7 @@ export class Imprenta implements OnInit {
             this.cargando = false;
             onFinish?.();
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error(err);
             this.pendingResultados = [];
             this.pendingTotal = 0;
@@ -214,7 +214,7 @@ export class Imprenta implements OnInit {
             this.cargando = false;
             onFinish?.();
           },
-          error: (err) => {
+          error: (err: any) => {
             console.error(err);
             this.pendingResultados = [];
             this.pendingTotal = 0;
@@ -269,21 +269,21 @@ export class Imprenta implements OnInit {
       this.imprentaService.obtenerPagosFacturadores(this.fechaInicio, this.fechaFin, true)
         .subscribe({
           next: (blob: Blob) => this.downlooadBlob(blob, `pagos_facturadores_${this.fechaInicio}_${this.fechaFin}.xlsx`),
-      error: (err) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
+  error: (err: any) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
         });
 
     } else if (this.tipoBusqueda === 'emisores') {
       this.imprentaService.obtenerEmisoresPorFechas(this.fechaInicio, this.fechaFin, 1, 99999, true)
         .subscribe({
           next: (blob: Blob) => this.downlooadBlob(blob, `emisores_${this.fechaInicio}_${this.fechaFin}.xlsx`),
-          error: (err) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
+          error: (err: any) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
         });
 
     } else if (this.tipoBusqueda === 'planes') {
       this.imprentaService.obtenerAuditoriaPlanesPorFechas(this.fechaInicio, this.fechaFin, 1, 99999, true)
         .subscribe({
           next: (blob: Blob) => this.downlooadBlob(blob, `auditoria_${this.fechaInicio}_${this.fechaFin}.xlsx`),
-          error: (err) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
+          error: (err: any) => { console.error(err); this.cargando = false; this.modalMessage = '❌ Error al descargar Excel'; this.modalLoading = false; this.showConfirmModal = true; }
         });
     }
   }
