@@ -4,11 +4,15 @@
     <div class="profile-avatar">
       <i class="fas fa-user-circle"></i>
     </div>
-    <div class="welcome-text">Bienvenido</div>
-    <div class="user-name">{{ currentUser?.nombreCompleto || currentUser?.USUAPELLIDO || 'Usuario' }}</div>
+  <div class="welcome-text">Bienvenido</div>
+
+    <div class="user-name">{{ currentUser?.USUAPELLIDO || 'Usuario' }}</div>
+
+  
+    <div class="user-email">{{ currentUser?.correo || currentUser?.CORREO || currentUser?.email }}</div>
   </div>
 
-  <!-- Navegación principal -->
+  <!-- Navegación principal (lista simple como estaba) -->
   <nav>
     <ul class="nav-list">
       <li class="nav-item">
@@ -34,7 +38,7 @@
 
       <li class="nav-item">
         <a routerLink="/orel" routerLinkActive="active" class="nav-link" (click)="onLinkClick()">
-          <i class="fas fa-file-alt"></i>
+          <i class="far fa-file-alt"></i>
           OREL
         </a>
       </li>
@@ -55,7 +59,7 @@
 
       <li class="nav-item">
         <a routerLink="/plantillas" routerLinkActive="active" class="nav-link" (click)="onLinkClick()">
-          <i class="fas fa-file"></i> <!-- Cambiado de fa-file-alt a fa-file  para el icono que se muestre al lado-->
+          <i class="fas fa-file"></i>
           PLANTILLAS
         </a>
       </li>

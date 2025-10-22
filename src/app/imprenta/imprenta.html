@@ -1,8 +1,102 @@
 <div class="imprenta-root">
-  <header class="imprenta-header">
-    <h1>Imprenta</h1>
-    <p class="muted">Panel de impresión — administra y monitorea los trabajos de impresión.</p>
-  </header>
+  <div class="container">
+    <div class="grid-firmas">
+      <!-- Columna izquierda: Título + Seleccionador -->
+      <div class="col-izq">
+        <div class="card-box">
+          <h1>Reportes de Imprenta</h1>
+        </div>
+        <div class="card-box">
+          <div class="bloque-seleccionador">
+            <label for="tipoBusquedaI">SELECCIONADOR</label>
+            <select id="tipoBusquedaI" [(ngModel)]="tipoBusqueda" (change)="onTipoBusquedaChange(tipoBusqueda)">
+              <option *ngFor="let opt of selectorOptions" [value]="opt.value">{{ opt.label }}</option>
+            </select>
+            <div class="selector-accion selector-centro">
+              <button class="btn-cargar" (click)="cargarDatos()">CARGAR DATOS</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna derecha: Filtros con título -->
+      <div class="col-der">
+        <div class="bloque-filtros">
+          <div class="box-title">CARGAR CAMPOS DINAMICAMENTE PARA FILTRO</div>
+          <div class="filtros-linea">
+            <div class="campo">
+              <label for="fechaInicio">Fecha de Inicio</label>
+              <input type="date" id="fechaInicio" [(ngModel)]="fechaInicio" placeholder="dd/mm/aaaa" />
+            </div>
+            <div class="campo">
+              <label for="fechaFin">Fecha de Fin</label>
+              <input type="date" id="fechaFin" [(ngModel)]="fechaFin" placeholder="dd/mm/aaaa" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="resultado-boton" *ngIf="datosCargados">
+      <div *ngIf="(total || resultados.length) > 0">
+        SE ENCONTRARON N° <strong>{{ total || resultados.length }}</strong> DE REGISTROS. PARA DESCARGAR, DA CLIC EN EL BOTÓN.
+      </div>
+      <div *ngIf="(total || resultados.length) === 0">
+        NO SE ENCONTRARON REGISTROS PARA LAS FECHAS SELECCIONADAS.
+      </div>
+      <button *ngIf="(total || resultados.length) > 0" class="btn primary btn-excel" (click)="exportar()">DESCARGAR</button>
+    </div>
+
+  <!-- Tabla de resultados -->
+    <div class="resultados-table" *ngIf="datosCargados && resultados && resultados.length > 0">
+      <table class="tabla-resultados">
+        <thead>
+          <tr>
+            <th *ngFor="let c of columnas">{{ c }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of resultados">
+            <td *ngFor="let c of columnas">{{ row[c] }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Paginador simple: solo visible si totalPages > 1 -->
+      <div class="paginador" *ngIf="totalPages && totalPages > 1">
+        <div class="paginador-row">
+          <div class="paginador-left">
+            <button class="btn prev" [disabled]="page<=1" (click)="cambiarPagina(page-1)">Anterior</button>
+          </div>
+          <div class="paginador-center">
+            <!-- Opcional: ocultar el texto de rango si no se necesita -->
+            <span class="pagina-info">Página {{page}} de {{totalPages}} — Mostrando {{ (page-1)*pageSize + 1 }} - {{ minDisplay(page*pageSize, total) }} de {{total}}</span>
+          </div>
+          <div class="paginador-right">
+            <button class="btn next" [disabled]="page>=totalPages" (click)="cambiarPagina(page+1)">Siguiente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de confirmación / cargando -->
+  <div class="modal-overlay" *ngIf="showConfirmModal">
+    <div class="modal-card">
+        <div class="modal-icon">⚠️</div>
+        <h3 class="modal-title" *ngIf="modalLoading">Espere, sus datos se están cargando...</h3>
+        <div class="modal-spinner" *ngIf="modalLoading">⏳</div>
+
+        <div class="modal-message" *ngIf="!modalLoading">
+          <p>{{ modalMessage }}</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn" (click)="cancelLoad()">Cancelar</button>
+          <button class="btn primary modal-ok" *ngIf="!modalLoading" (click)="confirmLoad()">OK</button>
+        </div>
+      </div>
+  </div>
 
   <section class="imprenta-widgets">
     <div class="card">
@@ -16,15 +110,6 @@
     <div class="card">
       <h2>Completadas Hoy</h2>
       <p class="card-number">47</p>
-    </div>
-  </section>
-
-  <section class="panel">
-    <h3>Acciones de Imprenta</h3>
-    <div class="quick-actions">
-      <button class="btn primary">Nuevo Trabajo</button>
-      <button class="btn primary">Cola de Impresión</button>
-      <button class="btn primary">Historial</button>
     </div>
   </section>
 </div>

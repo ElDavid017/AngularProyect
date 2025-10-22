@@ -16,6 +16,8 @@ export class Login {
   formLogin: FormGroup;
   loading = false;
   errorMessage: string | null = null;
+  showModal = false;
+  modalMessage = '';
 
   constructor(private fb: FormBuilder, private auth: AuthService, private router: Router) {
     this.formLogin = this.fb.group({
@@ -25,11 +27,15 @@ export class Login {
   }
 
   onSubmit() {
-    if (this.formLogin.invalid) return;
+    // Validación local: mostrar modal si faltan campos
+    if (this.formLogin.invalid) {
+      this.openModal('Por favor, llene todos los campos');
+      return;
+    }
     this.errorMessage = null;
     this.loading = true;
     const { user, pass } = this.formLogin.value;
-
+    
     this.auth.login(user, pass).subscribe({
       next: (res) => {
         this.loading = false;
@@ -41,16 +47,25 @@ export class Login {
       },
       error: (err) => {
         this.loading = false;
-        // Manejo básico de errores según backend
+        // Manejo básico de errores según backend y mostrar modal
         if (err?.status === 401) {
-          this.errorMessage = 'Contraseña incorrecta';
+          this.openModal('Contraseña incorrecta');
         } else if (err?.status === 404) {
-          this.errorMessage = 'Usuario no encontrado';
+          this.openModal('Usuario no encontrado');
         } else {
-          this.errorMessage = 'Error al iniciar sesión. Intente de nuevo';
+          this.openModal('Error al iniciar sesión. Intente de nuevo');
         }
       }
     });
+  }
+
+  openModal(message: string) {
+    this.modalMessage = message;
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
   }
 }
 

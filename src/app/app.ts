@@ -1,4 +1,4 @@
-import { Component, signal, OnDestroy, HostBinding } from '@angular/core';
+import { Component, signal, OnDestroy, OnInit, HostBinding } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { Navbar } from './navbar/navbar';
 import { Sidebar } from './sidebar/sidebar';
@@ -93,6 +93,106 @@ export class App implements OnDestroy {
     this.sub = this.router.events.subscribe((ev) => {
       if (ev instanceof NavigationEnd) {
         this.updateNavVisibility(ev.urlAfterRedirects);
+      }
+    });
+
+    // Cerrar sesión automáticamente cuando se cierra la pestaña o ventana
+    // usando un "heartbeat" en localStorage: mientras haya al menos
+    // una pestaña abierta, la aplicación actualizará un timestamp en
+    // localStorage. Cuando se abra la aplicación y el último timestamp
+    // sea más antiguo que el umbral, asumimos que todas las pestañas
+    // fueron cerradas y forzamos logout.
+    this.setupAutoLogout();
+  }
+
+  /** Configura el cierre de sesión automático al cerrar la pestaña/ventana */
+  private setupAutoLogout(): void {
+    if (typeof window === 'undefined') return;
+
+    const TAB_KEY_PREFIX = 'app_tab_';
+    const TAB_HEARTBEAT_INTERVAL_MS = 2000; // actualizamos cada 2s
+    const TAB_EXPIRY_MS = 7000; // consideramos tab muerta si no actualiza en 7s
+
+    // Reutilizar tabId durante recargas: almacenarlo en sessionStorage
+    let tabId = sessionStorage.getItem('app_tab_id');
+    if (!tabId) {
+      tabId = (window.crypto && (window.crypto as any).randomUUID)
+        ? (window.crypto as any).randomUUID()
+        : `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  try { sessionStorage.setItem('app_tab_id', tabId as string); } catch (e) { /* ignore */ }
+    }
+
+    const tabKey = `${TAB_KEY_PREFIX}${tabId}`;
+
+    const now = () => Date.now();
+
+    const setTabTimestamp = () => {
+      try { localStorage.setItem(tabKey, now().toString()); } catch (e) { /* ignore */ }
+    };
+
+    const removeTabKey = () => {
+      try { localStorage.removeItem(tabKey); } catch (e) { /* ignore */ }
+    };
+
+    const cleanupStaleTabs = () => {
+      try {
+        const keys = Object.keys(localStorage).filter(k => k.startsWith(TAB_KEY_PREFIX));
+        const threshold = now() - TAB_EXPIRY_MS;
+        for (const k of keys) {
+          const v = parseInt(localStorage.getItem(k) || '0', 10);
+          if (!v || v < threshold) {
+            try { localStorage.removeItem(k); } catch (e) { /* ignore */ }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    };
+
+    const countActiveTabs = () => {
+      try {
+        const keys = Object.keys(localStorage).filter(k => k.startsWith(TAB_KEY_PREFIX));
+        const threshold = now() - TAB_EXPIRY_MS;
+        let count = 0;
+        for (const k of keys) {
+          const v = parseInt(localStorage.getItem(k) || '0', 10);
+          if (v && v >= threshold) count++;
+        }
+        return count;
+      } catch (e) { return 0; }
+    };
+
+    // Limpieza inicial de pestañas muertas
+    cleanupStaleTabs();
+
+    // Si al iniciar no hay pestañas activas, entendemos que venimos tras
+    // cierre de todas las pestañas: eliminamos la sesión para forzar login.
+    try {
+      if (countActiveTabs() === 0) {
+        localStorage.removeItem('auth_token');
+        localStorage.removeItem('current_user');
+      }
+    } catch (e) { /* ignore */ }
+
+    // Registrar esta pestaña y actualizar periódicamente
+    setTabTimestamp();
+    const tabInterval = setInterval(setTabTimestamp, TAB_HEARTBEAT_INTERVAL_MS);
+
+    // Antes de abandonar, limpiamos sessionStorage (que es por pestaña) y el interval.
+    // NO eliminamos la key de localStorage aquí para no confundir recargas con cierres.
+    window.addEventListener('beforeunload', () => {
+      try { sessionStorage.removeItem('app_tab_id'); } catch (e) { /* ignore */ }
+      try { sessionStorage.clear(); } catch (e) { /* ignore */ }
+      try { clearInterval(tabInterval); } catch (e) { /* ignore */ }
+      // No removemos localStorage.removeItem(tabKey) aquí: dejamos que el
+      // mecanismo de expiración limpie las keys cuando ninguna pestaña esté viva.
+    });
+
+    // Cuando cambie localStorage (otra pestaña actualiza o borra su key), podemos
+    // limpiar keys antiguas. No forzamos logout aquí para evitar interferir en recargas.
+    window.addEventListener('storage', (ev: StorageEvent) => {
+      if (!ev.key || ev.key.startsWith(TAB_KEY_PREFIX)) {
+        cleanupStaleTabs();
       }
     });
   }

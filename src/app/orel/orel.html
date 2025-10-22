@@ -1,30 +1,78 @@
 <div class="orel-root">
-  <header class="orel-header">
-    <h1>OREL</h1>
-    <p class="muted">Sistema de gestión de documentos — monitorea, organiza y aprueba archivos.</p>
-  </header>
+  <div class="container">
+    <div class="grid-firmas">
+    <div class="col-izq">
+      <div class="card-box">
+        <h1>REPORTE OREL</h1>
+      </div>
+      <div class="card-box">
+        <div class="bloque-seleccionador">
+          <label>SELECCIONADOR</label>
+          <select disabled>
+            <option>Reporte Orel Complemento</option>
+          </select>
+          <div class="selector-accion">
+            <button class="btn-cargar" (click)="cargarDatos()">CARGAR DATOS</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <section class="orel-widgets">
-    <div class="card">
-      <h2>Documentos Totales</h2>
-      <p class="card-number">250</p>
+    <div class="col-der">
+      <div class="bloque-filtros">
+        <div class="box-title">CARGAR CAMPOS DINAMICAMENTE PARA FILTRO</div>
+        <div class="filtros-linea">
+          <div class="campo">
+            <label>FECHA INICIAL</label>
+            <input type="date" [(ngModel)]="fechaInicio" />
+          </div>
+          <div class="campo">
+            <label>FECHA FINAL</label>
+            <input type="date" [(ngModel)]="fechaFin" />
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="card">
-      <h2>En Revisión</h2>
-      <p class="card-number">14</p>
-    </div>
-    <div class="card">
-      <h2>Aprobados</h2>
-      <p class="card-number">231</p>
-    </div>
-  </section>
+  </div>
 
-  <section class="panel">
-    <h3>Acciones Rápidas</h3>
-    <div class="quick-actions">
-      <button class="btn primary">Subir Documento</button>
-      <button class="btn primary">Ver Historial</button>
-      <button class="btn primary">Bandeja de Revisión</button>
+  <div class="resultado-boton" *ngIf="datosCargados">
+    <div *ngIf="totalResults > 0">SE ENCONTRARON N° <strong>{{totalResults}}</strong> DE REGISTROS. PARA DESCARGAR EL REPORTE, DA CLIC EN EL BOTÓN.</div>
+    <div *ngIf="totalResults === 0">NO SE ENCONTRARON REGISTROS PARA LAS FECHAS SELECCIONADAS.</div>
+    <button *ngIf="totalResults > 0" class="btn-excel" (click)="exportarExcel()">DESCARGAR EXCEL</button>
+  </div>
+
+  <div id="loading" class="loading" [style.display]="loading ? 'block' : 'none'">Cargando...</div>
+
+  <div id="resultados" class="result">
+    <div class="registro" *ngFor="let r of datos">
+      <p><strong>IDREGISTRO:</strong> {{r.IDREGISTRO || '—'}}</p>
+      <p><strong>REGUSERNAME:</strong> {{r.REGUSERNAME || '—'}}</p>
+      <p><strong>REGRUC:</strong> {{r.REGRUC || '—'}}</p>
+      <p><strong>REGPLAN:</strong> {{r.REGPLAN || '—'}}</p>
+      <p><strong>CORREO:</strong> {{r.CORREO || '—'}}</p>
+      <p><strong>TELEFONO:</strong> {{r.TELEFONO || '—'}}</p>
+      <p><strong>VIGENCIA:</strong> {{r.VIGENCIA || '—'}}</p>
+      <p><strong>BOT_RECIBIDOS:</strong> {{r.BOT_RECIBIDOS || 0}}</p>
+      <p><strong>BOT_EMITIDOS:</strong> {{r.BOT_EMITIDOS || 0}}</p>
+      <p><strong>ESTADO:</strong> {{r.ESTADO || '—'}}</p>
     </div>
-  </section>
+  </div>
+
+  <div id="paginacion" class="paginacion" *ngIf="mostrarPaginacion">
+  <div class="pagina-info">Página {{pagina}} de {{totalPaginas}} — Mostrando {{startIndex}} - {{endIndex}} de {{totalResults}}</div>
+    <div class="pagina-controles"><button class="btn" [disabled]="pagina<=1" (click)="cambiarPagina(-1)">Anterior</button><button class="btn" [disabled]="pagina>=totalPaginas" (click)="cambiarPagina(1)">Siguiente</button></div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="showConfirmModal">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <h3 class="modal-title" *ngIf="modalLoading">Espere, sus datos se están cargando...</h3>
+      <div class="modal-spinner" *ngIf="modalLoading">⏳</div>
+      <div class="modal-message" *ngIf="!modalLoading"><p>{{ modalMessage }}</p></div>
+      <div class="modal-actions">
+        <button class="btn" (click)="modalLoading=false; showConfirmModal=false">Cancelar</button>
+        <button class="btn modal-ok" *ngIf="!modalLoading" (click)="confirmLoad()">OK</button>
+      </div>
+    </div>
+  </div>
 </div>

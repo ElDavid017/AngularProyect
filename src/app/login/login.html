@@ -1,24 +1,45 @@
 <div class="login-wrapper">
-  <form [formGroup]="formLogin" (ngSubmit)="onSubmit()" class="login-form">
-    <h2>Bienvenido</h2>
-
-    <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-    <div class="input-group">
-      <label for="user">Usuario</label>
-      <input id="user" type="text" formControlName="user" />
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="assets/BeLogo.JPG" alt="Be Logo" class="brand-img" loading="lazy" onerror="this.style.display='none'" />
+      <h2>Sistema de Reportes</h2>
+      <p class="subtitle">Gestión Digital</p>
     </div>
 
-    <div class="input-group">
-      <label for="pass">Contraseña</label>
-      <input id="pass" type="password" formControlName="pass" />
-    </div>
+    <form [formGroup]="formLogin" (ngSubmit)="onSubmit()" class="login-form">
+      <h3 class="welcome">Bienvenido</h3>
 
-    <button type="submit" class="btn btn-primary w-100" [disabled]="formLogin.invalid || loading">
+      <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+      <div class="input-group">
+        <label for="user">Usuario</label>
+        <input id="user" type="text" formControlName="user" placeholder="Ingresa tu usuario" />
+      </div>
+
+      <div class="input-group">
+        <label for="pass">Contraseña</label>
+        <input id="pass" type="password" formControlName="pass" placeholder="Ingresa tu contraseña" />
+      </div>
+
+      <button type="submit" class="btn primary w-100" [disabled]="formLogin.invalid || loading">
       {{ loading ? 'Entrando...' : 'Entrar' }}
     </button>
-    <div class="signup-cta">
-      <a class="signup-link" routerLink="/registros">¿No estás registrado? Regístrate</a>
+
+      <div class="signup-cta">
+        <a class="signup-link" routerLink="/registros">¿No estás registrado? Regístrate</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Modal de error (fuera de la tarjeta para que no se recorte) -->
+  <div class="modal-overlay" *ngIf="showModal">
+    <div class="modal-card">
+      <div class="modal-icon">✖</div>
+      <h3>Error</h3>
+      <p class="modal-msg">{{ modalMessage }}</p>
+      <div class="modal-actions">
+        <button class="btn modal-ok" (click)="closeModal()">OK</button>
+      </div>
     </div>
-  </form>
+  </div>
 </div>

@@ -1,101 +1,130 @@
 .login-wrapper {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
-  animation: fadeIn 1s ease-in;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.login-form {
-  background: #ffffff;
+  justify-content: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #eaf4ff 0%, #dcefff 100%);
   padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
-  animation: slideUp 0.8s ease-out;
-}
-.login-form h2 {
-  text-align: center;
-  color: #1976d2;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-}
-.login-form .input-group {
-  margin-bottom: 1.2rem;
-}
-.login-form .input-group label {
-  display: block;
-  margin-bottom: 0.4rem;
-  color: #0d47a1;
-  font-size: 0.9rem;
-}
-.login-form .input-group input {
-  width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #90caf9;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: box-shadow 0.3s;
-}
-.login-form .input-group input:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.3);
-}
-.login-form button {
-  width: 100%;
-  padding: 0.8rem;
-  background: #1976d2;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-.login-form button:hover {
-  background: #1565c0;
-}
-.login-form button:disabled {
-  background: #90caf9;
-  cursor: not-allowed;
-}
-.login-form .signup-cta {
-  margin-top: 0.8rem;
-  text-align: center;
-}
-.login-form .signup-link {
-  display: inline-block;
-  margin-top: 0.5rem;
-  color: #0d6efd;
-  text-decoration: none;
-  font-weight: 500;
-  background: transparent;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-}
-.login-form .signup-link:hover {
-  text-decoration: underline;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+/* Fondo animado sutil */
+.login-wrapper::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  background: radial-gradient(circle at 10% 20%, rgba(13,71,161,0.04), transparent 8%), radial-gradient(circle at 90% 80%, rgba(25,118,210,0.03), transparent 20%);
+  z-index: 0;
+  animation: floatBg 8s ease-in-out infinite;
 }
+
+@keyframes floatBg {
+  0% { transform: translateY(0px) }
+  50% { transform: translateY(-8px) }
+  100% { transform: translateY(0px) }
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(13, 71, 161, 0.08);
+  overflow: hidden;
+}
+
+/* Aparición suave de la tarjeta */
+.login-card { transform: translateY(12px) scale(.995); opacity:0; animation: cardIn .6s ease forwards .08s }
+@keyframes cardIn { to { transform: translateY(0) scale(1); opacity:1 } }
+
+.login-brand {
+  background: linear-gradient(90deg, #0d47a1, #1976d2);
+  color: #fff;
+  width: 100%;
+  text-align: center;
+  padding: 22px 18px;
+}
+
+.brand-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.12);
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+/* Pulso del logo */
+.brand-img { transform: translateY(-6px) scale(.98); opacity:0; animation: logoIn .6s cubic-bezier(.2,.9,.2,1) forwards .18s }
+@keyframes logoIn { to { transform: translateY(0) scale(1); opacity:1 } }
+
+.login-brand h2 { margin: 0; font-size: 18px; font-weight: 700 }
+.login-brand .subtitle { margin: 4px 0 0; font-size: 13px; opacity: 0.9 }
+
+.login-form {
+  width: 100%;
+  padding: 22px 26px 28px;
+}
+
+.login-form .welcome {
+  text-align: left;
+  color: #0d47a1;
+  margin: 0 0 14px;
+  font-size: 20px;
+}
+
+.login-form .input-group { margin-bottom: 12px }
+.login-form .input-group label { display:block; margin-bottom:6px; color:#0d47a1 }
+.login-form .input-group input {
+  width: 100%; padding: 10px 12px; border:1px solid #cfe3fb; border-radius:8px; font-size:14px;
+  transition: box-shadow .18s ease, border-color .18s ease;
+}
+.login-form .input-group input:focus { outline:none; box-shadow:0 6px 18px rgba(25,118,210,0.08); border-color:#90caf9 }
+
+.login-form button { width:100%; padding:12px; border-radius:10px; background: linear-gradient(90deg,#1565c0,#0d47a1); color:#fff; border:none; font-weight:600 }
+.login-form button:hover { filter:brightness(.95); }
+.login-form button:disabled { opacity:.7 }
+
+.signup-cta { margin-top:10px; text-align:center }
+.signup-link { color:#1976d2; text-decoration:none; font-weight:600 }
+.signup-link:hover { text-decoration:underline }
+
+@media (max-width:480px) {
+  .login-card { max-width: 360px }
+  .brand-img { width:56px; height:56px }
+}
+
+/* Modal de errores */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 2000;
+}
+.modal-card {
+  background:#fff; padding:22px; border-radius:10px; width:360px; max-width:92%; text-align:center; box-shadow:0 12px 36px rgba(0,0,0,0.18);
+}
+.modal-icon { font-size:42px; color:#e57373; margin-bottom:8px }
+.modal-msg { color:#333; margin: 8px 0 14px }
+.modal-actions { display:flex; justify-content:center }
+.modal-ok { background:#6c5ce7; color:#fff; border:none; padding:8px 16px; border-radius:6px; cursor:pointer }
+.modal-ok:hover { filter:brightness(.95) }
+
+/* Estilo del botón principal (coincidente con signup) */
+.btn.primary {
+  background: linear-gradient(90deg,#1565c0,#0d47a1);
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(13,71,161,0.12);
+}
+.btn.primary:hover { filter:brightness(.95); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(13,71,161,0.14) }
+.btn.primary:disabled { opacity: .75; filter:none }

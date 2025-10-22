@@ -3,46 +3,54 @@
 
     <!-- Sección Izquierda -->
     <div class="d-flex align-items-center navbar-left">
-      <button class="btn btn-outline-primary me-3" (click)="onToggle()" aria-label="Abrir menú lateral">
+      <button class="btn-menu" (click)="onToggle()" aria-label="Abrir menú lateral">
         <i class="fas fa-bars"></i>
       </button>
 
-      <div class="brand-section d-flex align-items-center">
-        <div class="brand-logo me-2" aria-hidden="true">
-          <i class="fas fa-chart-line fs-4 text-primary"></i>
+      <div class="brand-section">
+        <div class="brand-logo">
+          <i class="fas fa-chart-line"></i>
         </div>
-        <div>
-          <h1 class="brand-title mb-0 fs-5 fw-bold">Sistema de Reportes</h1>
-          <span class="brand-subtitle small text-secondary">Gestión Digital</span>
+        <div class="brand-info">
+          <h1 class="brand-title">Sistema de Reportes</h1>
+          <span class="brand-subtitle">Gestión Digital</span>
         </div>
       </div>
     </div>
 
     <!-- Sección Derecha -->
-    <div class="navbar-right d-flex align-items-center ms-auto">
-
-      <!-- Notificaciones -->
-      <button class="btn position-relative me-3" *ngIf="auth.isAuthenticated()" aria-label="Notificaciones">
-        <i class="fas fa-bell fs-5"></i>
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">3</span>
-      </button>
-
+    <div class="navbar-right" *ngIf="auth.isAuthenticated()">
       <!-- Usuario -->
-      <div class="dropdown" *ngIf="auth.isAuthenticated()">
-        <button class="btn btn-outline-secondary dropdown-toggle d-flex align-items-center gap-2"
-                id="userConfigDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-user-circle fs-4"></i>
-          <div class="text-start">
-            <span class="fw-semibold d-block">{{ auth.getCurrentUser()?.nombreCompleto || 'Usuario' }}</span>
-            <small class="text-muted">Administrador</small>
+      <div class="user-dropdown dropdown">
+        <button class="user-btn" id="userConfigDropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <div class="user-avatar">
+            <i class="fas fa-user"></i>
           </div>
+          <div class="user-info">
+            <span class="user-name">{{ auth.getCurrentUser()?.USUAPELLIDO || 'Usuario' }}</span>
+            <small class="user-role">{{ auth.getCurrentUser()?.USUPERFIL || 'Usuario' }}</small>
+          </div>
+          <i class="fas fa-chevron-down dropdown-icon"></i>
         </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userConfigDropdown">
-          <li><a class="dropdown-item" routerLink="/perfil"><i class="fas fa-user me-2"></i> Mi Perfil</a></li>
-          <li><a class="dropdown-item"><i class="fas fa-cog me-2"></i> Configuración</a></li>
-          <li><a class="dropdown-item"><i class="fas fa-question-circle me-2"></i> Ayuda</a></li>
+        
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userConfigDropdown">
+          <li class="dropdown-header">
+            <div class="dropdown-user-info">
+              <div class="dropdown-avatar">
+                <i class="fas fa-user"></i>
+              </div>
+              <div>
+                <div class="dropdown-user-name">{{ auth.getCurrentUser()?.USUAPELLIDO || 'Usuario' }}</div>
+                <div class="dropdown-user-role">{{ auth.getCurrentUser()?.USUPERFIL || 'Usuario' }}</div>
+              </div>
+            </div>
+          </li>
           <li><hr class="dropdown-divider"></li>
-          <li><button class="dropdown-item text-danger" (click)="logout()"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</button></li>
+          <li><a class="dropdown-item" routerLink="/perfil"><i class="fas fa-user-circle"></i> Mi Perfil</a></li>
+          <li><a class="dropdown-item"><i class="fas fa-cog"></i> Configuración</a></li>
+          <li><a class="dropdown-item"><i class="fas fa-question-circle"></i> Ayuda</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><button class="dropdown-item logout-btn" (click)="logout()"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</button></li>
         </ul>
       </div>
     </div>

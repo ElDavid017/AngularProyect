@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, OnDestroy, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, EventEmitter, Output, OnDestroy, AfterViewInit, Inject, PLATFORM_ID, OnInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -14,7 +14,7 @@ import { SidebarService } from '../services/sidebar.service';
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
-export class Navbar implements OnDestroy, AfterViewInit {
+export class Navbar implements OnInit, OnDestroy, AfterViewInit {
   @Output() toggle = new EventEmitter<void>();
   showSolicitar = true;
   private sub: Subscription | null = null;
@@ -31,6 +31,15 @@ export class Navbar implements OnDestroy, AfterViewInit {
         this.updateShowSolicitar(ev.urlAfterRedirects);
       }
     });
+  }
+
+  ngOnInit(): void {
+    try {
+      const u = this.auth.getCurrentUser();
+      if (!u || !u.USUAPELLIDO) {
+        this.auth.fetchAndCacheCurrentUser().subscribe({ next: () => {}, error: () => {} });
+      }
+    } catch {}
   }
 
   ngAfterViewInit(): void {

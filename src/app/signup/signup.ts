@@ -54,6 +54,9 @@ export class Sigup {
   onSubmit() {
     if (this.formSigup.invalid) {
       this.formSigup.markAllAsTouched();
+      // Construir mensaje de validación detallado y mostrar modal
+      this.dialogMessage = this.buildValidationMessage();
+      this.showDialog = true;
       return;
     }
 
@@ -80,6 +83,19 @@ export class Sigup {
 
   closeDialog() {
     this.showDialog = false;
+    this.dialogMessage = '';
+  }
+
+  private buildValidationMessage(): string {
+    const errors: string[] = [];
+    const controls = this.formSigup.controls;
+    if (controls['usuid'].invalid) errors.push('- Identificación (requerida)');
+    if (controls['usuclave'].invalid) errors.push('- Contraseña (mínimo 4 caracteres)');
+    if (controls['usuapellido'].invalid) errors.push('- Apellido (requerido)');
+    if (controls['usunombre'].invalid) errors.push('- Nombre (requerido)');
+    if (controls['correo'].invalid) errors.push('- Correo inválido o vacío');
+    if (controls['telefono'].invalid) errors.push('- Teléfono inválido (10 dígitos)');
+    return errors.length ? ('Por favor corrija los siguientes campos:\n' + errors.join('\n')) : 'Complete los campos requeridos';
   }
 }
 

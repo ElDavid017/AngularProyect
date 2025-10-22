@@ -21,6 +21,8 @@ import { Imprenta } from './imprenta/imprenta';
 import { Firmador } from './firmador/firmador';
 import { Plantillas } from './plantillas/plantillas';
 
+
+
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
@@ -34,5 +36,7 @@ export const routes: Routes = [
   { path: 'imprenta', component: Imprenta, canActivate: [AuthGuard] },
   { path: 'firmador', component: Firmador, canActivate: [AuthGuard] },
   { path: 'plantillas', component: Plantillas, canActivate: [AuthGuard] }
+  
 ];
+
 

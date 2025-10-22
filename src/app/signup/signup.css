@@ -1,114 +1,63 @@
-/* Fondo general */
 :host {
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #e0f0ff, #f8fbff);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg,#eef8ff 0%, #e6f2ff 100%);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  padding: 20px;
 }
 
-/* Contenedor principal del formulario */
-.form-container {
-  background-color: #0036cc;
-  backdrop-filter: blur(8px);
-  padding: 40px 30px;
-  border-radius: 15px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
+.signup-card {
   width: 100%;
-}
-
-/* Título */
-.form-title {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #1a1a1a;
-  margin-bottom: 10px;
-}
-
-.form-subtitle {
-  color: #6c757d;
-  font-size: 0.95rem;
-  margin-bottom: 25px;
-}
-
-/* Inputs */
-input {
-  width: 100%;
-  padding: 12px 15px;
-  margin-bottom: 20px;
-  border: 1px solid #d1d1d1;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  transition: border 0.2s ease;
-}
-
-input:focus {
-  border-color: #007bff;
-  outline: none;
-  background-color: #fff;
-}
-
-/* Grid para inputs en línea */
-.input-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 15px;
-}
-
-/* Botones */
-.button-group {
+  max-width: 820px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(13,71,161,0.08);
+  overflow: hidden;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
+  flex-direction: column;
+  animation: cardUp .5s ease both;
 }
 
-button {
-  padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.95rem;
-  background: linear-gradient(135deg, #0048ff, #336dff);
+.signup-top {
+  background: linear-gradient(90deg,#0d47a1,#1976d2);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(0, 72, 255, 0.15);
-  transition: all 0.25s ease;
+  padding: 28px 22px;
+  text-align: center;
 }
+.signup-logo { width:68px; height:68px; object-fit:contain; border-radius:10px; background:rgba(255,255,255,0.12); display:block; margin:0 auto 10px }
+.signup-top h2 { margin:0; font-size:20px; font-weight:700 }
+.signup-top .muted { margin:6px 0 0; opacity:.9; font-size:13px }
 
-button:hover {
-  background: linear-gradient(135deg, #0036cc, #2f5de2);
-  box-shadow: 0 6px 18px rgba(0, 72, 255, 0.25);
-  transform: translateY(-2px);
+.signup-form { padding: 22px 26px 30px }
+.form-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:14px }
+.field { display:flex; flex-direction:column }
+.field label { font-size:13px; color:#0d47a1; margin-bottom:6px }
+.field input { padding:10px 12px; border:1px solid #dcefff; border-radius:8px; transition:box-shadow .18s, border-color .18s }
+.field input:focus { outline:none; box-shadow:0 8px 20px rgba(13,71,161,0.06); border-color:#90caf9 }
+.field.full { grid-column: 1 / -1 }
+.error { color:#e53935; font-size:12px; margin-top:6px }
+
+.row-actions { margin-top:18px; display:flex; gap:12px; justify-content:flex-end }
+.btn { padding:12px 18px; border-radius:10px; border:none; font-weight:600 }
+.btn.primary { background: linear-gradient(90deg,#1565c0,#0d47a1); color:#fff }
+.btn.secondary { background:transparent; color:#1976d2 }
+.btn.primary:disabled { opacity:.7 }
+
+@keyframes cardUp { from { transform: translateY(18px); opacity:0 } to { transform: translateY(0); opacity:1 } }
+
+@media (max-width:900px) { .form-grid { grid-template-columns: 1fr } .signup-card { max-width:540px } }
+
+/* Modal dialog */
+.dialog-backdrop {
+  position: fixed; inset: 0; display:flex; align-items:center; justify-content:center; background: rgba(0,0,0,0.45); z-index:2500;
 }
+.dialog { background:#fff; padding:22px; width:380px; max-width:92%; border-radius:10px; box-shadow:0 12px 36px rgba(0,0,0,0.18); text-align:center; }
+.dialog h3 { margin:0 0 8px; color:#0d47a1 }
+.dialog p { color:#333; white-space: pre-line }
+.dialog-actions { margin-top:14px; display:flex; justify-content:center }
+.dialog .btn.primary { padding:8px 16px }
 
-button:active {
-  transform: translateY(0);
-  box-shadow: 0 3px 8px rgba(0, 72, 255, 0.2);
-}
-
-button:disabled {
-  background: #a0c8ff;
-  cursor: not-allowed;
-  box-shadow: none;
-  opacity: 0.7;
-}
-
-
-button.cancel {
-  background-color: transparent;
-  color: #555;
-}
-
-/* Responsive ajustes */
-@media (max-width: 600px) {
-  .form-container {
-    padding: 25px 20px;
-  }
-
-  .form-title {
-    font-size: 1.5rem;
-  }
-}
+@keyframes dialogIn { from { transform: scale(.96); opacity:0 } to { transform: scale(1); opacity:1 } }
+.dialog { animation: dialogIn .22s ease both }

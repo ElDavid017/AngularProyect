@@ -1,26 +1,59 @@
-/**
- * @fileoverview Servicio de autenticación que maneja el proceso de login/logout
- * y la gestión del token JWT. Incluye manejo de diferentes formatos de payload
- * y un modo de demostración.
- * 
- * Características principales:
- * - Gestión de token JWT en localStorage
- * - Soporte para múltiples formatos de payload de login
- * - Modo demo con credenciales demo/demo
- * - Protección contra errores en SSR
- * - Manejo de errores y reintentos
- */
+
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap, catchError, switchMap } from 'rxjs/operators';
-import { of, throwError } from 'rxjs';
+import { of, throwError, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private tokenKey = 'auth_token';
   private userKey = 'current_user';
+
+  /** Normaliza el objeto usuario para asegurar que tenga USUAPELLIDO y USUPERFIL */
+  private normalizeUser(u: any): any {
+    if (!u || typeof u !== 'object') return u;
+    
+    // Normalizar USUAPELLIDO (nombre)
+    const posiblesNombre = [
+      'USUAPELLIDO', 'usuapellido', 'USU_APELLIDO', 'apellido', 'apellidos', 'APELLIDO', 'APELLIDOS',
+      'NombreCompleto', 'nombreCompleto', 'NOMBRE_COMPLETO'
+    ];
+    let valorNombre = u['USUAPELLIDO'];
+    if (!valorNombre) {
+      for (const k of posiblesNombre) {
+        if (u[k] && typeof u[k] === 'string') { valorNombre = u[k]; break; }
+      }
+    }
+    if (valorNombre && !u['USUAPELLIDO']) {
+      u['USUAPELLIDO'] = String(valorNombre).trim();
+    }
+    // mantener compatibilidad con vistas anteriores
+    if (u['USUAPELLIDO'] && !u['nombreCompleto']) {
+      u['nombreCompleto'] = u['USUAPELLIDO'];
+    }
+
+    // Normalizar USUPERFIL (perfil/rol)
+    const posiblesPerfil = [
+      'USUPERFIL', 'usuperfil', 'perfil', 'PERFIL', 'rol', 'ROL', 'role', 'ROLE'
+    ];
+    let valorPerfil = u['USUPERFIL'];
+    if (!valorPerfil) {
+      for (const k of posiblesPerfil) {
+        if (u[k] && typeof u[k] === 'string') { valorPerfil = u[k]; break; }
+      }
+    }
+    if (valorPerfil && !u['USUPERFIL']) {
+      u['USUPERFIL'] = String(valorPerfil).trim();
+    }
+    // Si no hay perfil, usar valor por defecto
+    if (!u['USUPERFIL']) {
+      u['USUPERFIL'] = 'Usuario';
+    }
+
+    return u;
+  }
 
   /** Obtiene la información del usuario actual del localStorage */
   getCurrentUser(): any {
@@ -29,11 +62,9 @@ export class AuthService {
       const userData = localStorage.getItem(this.userKey);
       if (!userData) return null;
       
-      const user = JSON.parse(userData);
-      // USUAPELLIDO ya contiene el nombre completo
-      if (user.USUAPELLIDO) {
-        user.nombreCompleto = user.USUAPELLIDO;
-      }
+      const user = this.normalizeUser(JSON.parse(userData));
+      // persistir normalizado por si faltaba el campo
+      try { localStorage.setItem(this.userKey, JSON.stringify(user)); } catch (e) {}
       return user;
     } catch (e) {
       return null;
@@ -41,6 +72,20 @@ export class AuthService {
   }
 
   constructor(private http: HttpClient, private router: Router) {}
+
+  /** Obtiene el usuario desde el backend y lo cachea en localStorage */
+  fetchAndCacheCurrentUser(): Observable<any> {
+    return this.http.get<any>('/api/me').pipe(
+      tap((res) => {
+        const user = this.normalizeUser(res);
+        try { localStorage.setItem(this.userKey, JSON.stringify(user)); } catch {}
+      }),
+      catchError((err) => {
+        console.error('AuthService: no se pudo cargar /api/me', err);
+        return of(null);
+      })
+    );
+  }
 
   login(usuario: string, clave: string) {
     // Intentamos primero con { Usuario, Clave } (como está en el código)
@@ -61,8 +106,10 @@ export class AuthService {
               }
               
               // Guardamos los datos del usuario, manejando ambos formatos de respuesta
-              const userData = res.user || res;
+              const userData = this.normalizeUser(res.user || res);
               localStorage.setItem(this.userKey, JSON.stringify(userData));
+              // Refrescar desde backend para asegurar que USUAPELLIDO esté actualizado
+              try { this.fetchAndCacheCurrentUser().subscribe(); } catch {}
             }
           } catch (e) {
             console.error('Error guardando datos:', e);
@@ -89,9 +136,10 @@ export class AuthService {
                     localStorage.setItem(this.tokenKey, res.token);
                   }
                   // Guardamos datos del usuario
-                  const userData = res.user || res;
+                  const userData = this.normalizeUser(res.user || res);
                   if (userData) {
                     localStorage.setItem(this.userKey, JSON.stringify(userData));
+                    try { this.fetchAndCacheCurrentUser().subscribe(); } catch {}
                   }
                 }
               } catch (e) {

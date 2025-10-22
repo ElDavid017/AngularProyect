@@ -1,44 +1,138 @@
 <div class="container">
-  <h1>Visualización de Firmas</h1>
 
-  <!-- Selector de tipo de búsqueda -->
-  <label for="tipoBusqueda">Selecciona tipo de búsqueda:</label>
-  <select id="tipoBusqueda" [(ngModel)]="tipoBusqueda" (change)="toggleEstado()">
-    <option value="firmas_fecha">Buscar firmas por fecha</option>
-    <option value="firmas_caducar">Firmas por caducar</option>
-  </select>
+  <div class="grid-firmas">
+    <!-- Columna izquierda: Título + Seleccionador (apilados) -->
+    <div class="col-izq">
+      <div class="card-box">
+        <h1>REPORTES DE FIRMAS</h1>
+      </div>
+      <div class="card-box">
+        <div class="bloque-seleccionador">
+          <label for="tipoBusqueda">SELECCIONADOR</label>
+          <select id="tipoBusqueda" [(ngModel)]="tipoBusqueda" (change)="toggleEstado()">
+            <option value="firmas_fecha">Buscar firmas por fecha</option>
+            <option value="facturas_fecha">Facturas por fechas</option>
+            <option value="firmas_generadas_factura">Firmas generadas con factura</option>
+            <option value="filtro_distribuidores">Filtrar Distribuidores por fechas</option>
+            <option value="firmas_por_enganchador">Firmas por Enganchador</option>
+            <option value="firmas_vendidas">Firmas vendidas</option>
+          </select>
+          <!-- Botón movido dentro del contenedor del seleccionador -->
+          <div class="selector-accion">
+            <button class="btn-cargar" (click)="cargarDatos()">CARGAR DATOS</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
-  <!-- Fechas -->
-  <label for="fecha_inicio">Ingresa la fecha de inicio:</label>
-  <input type="date" id="fecha_inicio" [(ngModel)]="fechaInicio" required />
+    <!-- Columna derecha: Filtros con título -->
+    <div class="col-der">
+      <div class="bloque-filtros">
+        <div class="box-title">CARGAR CAMPOS DINAMICAMENTE PARA FILTRO</div>
+        <div class="filtros-linea">
+          <ng-container *ngIf="tipoBusqueda !== 'firmas_vendidas'">
+            <div class="campo">
+              <label for="fecha_inicio">FECHA INICIAL</label>
+              <input type="date" id="fecha_inicio" [(ngModel)]="fechaInicio" required />
+            </div>
 
-  <label for="fecha_fin">Ingresa la fecha de fin:</label>
-  <input type="date" id="fecha_fin" [(ngModel)]="fechaFin" required />
+            <div class="campo">
+              <label for="fecha_fin">FECHA FINAL</label>
+              <input type="date" id="fecha_fin" [(ngModel)]="fechaFin" required />
+            </div>
+          </ng-container>
 
-  <!-- Filtro Estado -->
-  <div id="filtroEstado" [style.display]="mostrarEstado ? 'block' : 'none'" class="margin-bottom">
-    <label for="estado">Estado de la firma:</label>
-    <select id="estado" [(ngModel)]="estado">
-      <option value="Todos">Todos</option>
-      <option value="Vigente">Vigente</option>
-      <option value="Vencida">Vencida</option>
-    </select>
+          <!-- En la tercera columna mostramos COD DIS para búsquedas por fecha,
+               y mostramos ESTADO (subido al mismo lugar) cuando la selección
+               es "Firmas por caducar". Esto evita mostrar COD DIS en caducar. -->
+          <div class="campo">
+            <ng-container *ngIf="tipoBusqueda === 'firmas_fecha'">
+              <label for="cod_dis">COD DIS</label>
+              <input type="text" id="cod_dis" [(ngModel)]="cod_dis" placeholder="Ej: D123" />
+            </ng-container>
+            <ng-container *ngIf="tipoBusqueda === 'firmas_por_enganchador'">
+              <label for="codigo_enganchador">CÓDIGO ENGANCHADOR</label>
+              <input type="text" id="codigo_enganchador" [(ngModel)]="codigo_enganchador" placeholder="Ej: E123" />
+            </ng-container>
+          </div>
+        </div>
+        <div class="acciones-der" style="visibility:hidden; height:0; margin:0; padding:0;">
+          <!-- botón movido arriba para mantener estructura visual; oculto aquí -->
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-    <button (click)="buscar()">Ver registros</button>
-    <button id="btnExportar" class="btn btn-success" (click)="exportarExcel()">
-      📤 Exportar a Excel
-    </button>
+  <!-- ===== RESULTADOS Y BOTÓN EXCEL ===== -->
+  <div class="resultado-boton" *ngIf="datosCargados">
+    <div *ngIf="totalResults > 0">
+      SE ENCONTRARON N° <strong>{{totalResults}}</strong> DE REGISTROS. PARA DESCARGAR EL REPORTE, DA CLIC EN EL BOTÓN.
+    </div>
+    <div *ngIf="totalResults === 0">
+      NO SE ENCONTRARON REGISTROS PARA LAS FECHAS SELECCIONADAS.
+    </div>
+    <button *ngIf="totalResults > 0" class="btn-excel" (click)="exportarExcel()">DESCARGAR EXCEL</button>
   </div>
 
-  <!-- Cargando Spinner -->
-  <div id="loading" class="loading" [style.display]="loading ? 'block' : 'none'">Cargando...</div>
+  <!-- ===== CARGANDO ===== -->
+  <div id="loading" class="loading" [style.display]="loading ? 'block' : 'none'">
+    Cargando...
+  </div>
 
-  <!-- Resultados -->
+  <!-- ===== RESULTADOS ===== -->
   <div id="resultados" class="result">
     <div class="registro" *ngFor="let firma of firmas">
-      <!-- Para firmas_fecha -->
+      <ng-container *ngIf="tipoBusqueda === 'firmas_por_enganchador'">
+        <p><strong>ID:</strong> {{firma.ID || firma.id || '—'}}</p>
+        <p><strong>RUC:</strong> {{firma.RUC || firma.ruc || '—'}}</p>
+        <p><strong>Cédula:</strong> {{firma.CEDULA || firma.cedula || '—'}}</p>
+        <p><strong>Razón Social:</strong> {{firma.RAZON_SOCIAL || firma.razon_social || '—'}}</p>
+        <p><strong>Tipo:</strong> {{firma.TIPO || firma.tipo || '—'}}</p>
+        <p><strong>Código Único:</strong> {{firma.CODIGO_UNICO || firma.codUnico || '—'}}</p>
+        <p><strong>Día / Mes:</strong> {{firma.DIA || firma.dia || '—'}} / {{firma.MES || firma.mes || '—'}}</p>
+        <p><strong>Periodo:</strong> {{firma.PERIODO || firma.periodo || '—'}}</p>
+        <p><strong>Duración:</strong> {{firma.DURACION || firma.duracion || '—'}}</p>
+        <p><strong>Dirección:</strong> {{firma.DIRECCION || firma.direccion || '—'}}</p>
+        <p><strong>Correo:</strong> {{firma.CORREO || firma.correo || '—'}}</p>
+        <p><strong>Teléfono:</strong> {{firma.TELEFONO || firma.telefono || '—'}}</p>
+        <p><strong>Valor Cobrado:</strong> {{firma.VALOR_COBRADO || firma.valorC || '—'}}</p>
+        <p><strong>Banco:</strong> {{firma.BANCO || firma.Banco || '—'}}</p>
+        <p><strong>Hora Ingreso:</strong> {{formatearFechaHora(firma.HORA_INGRESO || firma.horaIngreso)}}</p>
+        <p><strong>Hora Tramitación:</strong> {{formatearFechaHora(firma.HORA_TRAMITACION || firma.horaTramitacion)}}</p>
+        <p><strong>Hora Finalización:</strong> {{formatearFechaHora(firma.HORA_FINALIZACION || firma.horaFinalizacion)}}</p>
+        <p><strong>Tiempo Firma:</strong> {{firma.TIEMPO_FIRMA || firma.tiempoFirma || '—'}}</p>
+        <p><strong>Emisor:</strong> {{firma.EMISOR || firma.Emisor || '—'}}</p>
+        <p><strong>Estado:</strong> {{firma.ESTADO || firma.Estado || '—'}}</p>
+        <p><strong>Comentario:</strong> {{firma.COMENTARIO || firma.Comentario || '—'}}</p>
+        <p><strong>Plataforma:</strong> {{firma.PLATAFORMA_FIRMAS || '—'}}</p>
+        <p><strong>Distribuidor:</strong> {{firma.NOMBRE_DISTRIBUIDOR || firma.nombre_distribuidor || '—'}}</p>
+        <p><strong>Código Distribuidor:</strong> {{firma.CODIGO_DISTRIBUIDOR || firma.CODIGO_DISTRIBUIDOR || '—'}}</p>
+        <p><strong>Nombre Enganchador:</strong> {{firma.NOMBRE_ENGANCHADOR || firma.nombre_enganchador || '—'}}</p>
+        <p><strong>Código Enganchador:</strong> {{firma.CODIGO_ENGANCHADOR || firma.codigo_enganchador || '—'}}</p>
+      </ng-container>
+      <ng-container *ngIf="tipoBusqueda === 'facturas_fecha'">
+        <p><strong>ID:</strong> {{firma.id || '—'}}</p>
+        <p><strong>RUC:</strong> {{firma.ruc || '—'}}</p>
+        <p><strong>Código Único:</strong> {{firma.codUnico || firma.codUnico || '—'}}</p>
+        <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
+        <p><strong>Localizador:</strong> {{firma.localizador || '—'}}</p>
+        <p><strong>Código Distribuidor:</strong> {{firma.codDis || firma.codidgo_distribuidor || '—'}}</p>
+        <p><strong>Tipo:</strong> {{firma.tipo || '—'}}</p>
+        <p><strong>Día / Mes:</strong> {{firma.dia || '—'}} / {{firma.mes || '—'}}</p>
+        <p><strong>Duración:</strong> {{firma.duracion || firma.duracion_firma || '—'}}</p>
+        <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
+        <p><strong>Dirección:</strong> {{firma.direccion || '—'}}</p>
+        <p><strong>Correo:</strong> {{firma.correo || '—'}}</p>
+        <p><strong>Teléfono:</strong> {{firma.telefono || firma.celular || '—'}}</p>
+        <p><strong>Valor:</strong> {{firma.valorC || '—'}}</p>
+        <p><strong>Banco:</strong> {{firma.Banco || firma.banco || '—'}}</p>
+        <p><strong>Hora Ingreso:</strong> {{formatearFechaHora(firma.horaIngreso)}}</p>
+        <p><strong>Hora Tramitación:</strong> {{formatearFechaHora(firma.horaTramitacion)}}</p>
+        <p><strong>Estado:</strong> {{firma.Estado || firma.estado || '—'}}</p>
+        <p><strong>Periodo:</strong> {{firma.periodo || firma.periodo_registro || '—'}}</p>
+        <p><strong>Clave:</strong> {{firma.clave || '—'}}</p>
+        <p><strong>Tipo P:</strong> {{firma.tipoP || '—'}}</p>
+      </ng-container>
       <ng-container *ngIf="tipoBusqueda === 'firmas_fecha'">
         <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
         <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
@@ -51,7 +145,78 @@
         <p><strong>Periodo Registro:</strong> {{firma.periodo_registro || '—'}}</p>
       </ng-container>
 
-      <!-- Para firmas_caducar -->
+      <ng-container *ngIf="tipoBusqueda === 'firmas_vendidas'">
+        <p><strong>Usuario:</strong> {{firma.USUAPELLIDO || firma.USUAPELLIDO || '—'}}</p>
+        <p><strong>CodUserT:</strong> {{firma.codUserT || '—'}}</p>
+        <p><strong>Mes:</strong> {{firma.mes || '—'}}</p>
+        <p><strong>Periodo:</strong> {{firma.periodo || '—'}}</p>
+        <p><strong>1 año:</strong> {{firma['1_año'] || 0}}</p>
+        <p><strong>2 años:</strong> {{firma['2_años'] || 0}}</p>
+        <p><strong>3 años:</strong> {{firma['3_años'] || 0}}</p>
+        <p><strong>4 años:</strong> {{firma['4_años'] || 0}}</p>
+        <p><strong>5 años:</strong> {{firma['5_años'] || 0}}</p>
+        <p><strong>1 mes:</strong> {{firma['1_mes'] || 0}}</p>
+        <p><strong>6 meses:</strong> {{firma['6_meses'] || 0}}</p>
+        <p><strong>7 días:</strong> {{firma['7_días'] || 0}}</p>
+        <p><strong>15 días:</strong> {{firma['15_días'] || 0}}</p>
+        <p><strong>Sin duración:</strong> {{firma['sin_duración'] || 0}}</p>
+        <p><strong>Total firmas:</strong> {{firma.total_firmas || 0}}</p>
+      </ng-container>
+
+      <ng-container *ngIf="tipoBusqueda === 'firmas_generadas_factura'">
+        <p><strong>ID:</strong> {{firma.id || '—'}}</p>
+        <p><strong>RUC:</strong> {{firma.ruc || '—'}}</p>
+        <p><strong>Código Único:</strong> {{firma.codUnico || '—'}}</p>
+        <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
+        <p><strong>Localizador:</strong> {{firma.localizador || '—'}}</p>
+        <p><strong>Código Distribuidor:</strong> {{firma.codDis || '—'}}</p>
+        <p><strong>Nombre Distribuidor:</strong> {{firma.nombre_distribuidor || '—'}}</p>
+        <p><strong>Correo Distribuidor:</strong> {{firma.correo_distribuidor || '—'}}</p>
+        <p><strong>Teléfono Distribuidor:</strong> {{firma.telefono_distribuidor || '—'}}</p>
+        <p><strong>Tipo:</strong> {{firma.tipo || '—'}}</p>
+        <p><strong>Día / Mes:</strong> {{firma.dia || '—'}} / {{firma.mes || '—'}}</p>
+        <p><strong>Duración:</strong> {{firma.duracion || '—'}}</p>
+        <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
+        <p><strong>Dirección:</strong> {{firma.direccion || '—'}}</p>
+        <p><strong>Correo Cliente:</strong> {{firma.correo || '—'}}</p>
+        <p><strong>Teléfono Cliente:</strong> {{firma.telefono || '—'}}</p>
+        <p><strong>Valor:</strong> {{firma.valorC || '—'}}</p>
+        <p><strong>Banco:</strong> {{firma.Banco || '—'}}</p>
+        <p><strong>Usuario Entrada:</strong> {{firma.codUserT || '—'}}</p>
+        <p><strong>Hora Ingreso:</strong> {{formatearFechaHora(firma.horaIngreso)}}</p>
+        <p><strong>Hora Tramitación:</strong> {{formatearFechaHora(firma.horaTramitacion)}}</p>
+        <p><strong>Hora Finalización:</strong> {{formatearFechaHora(firma.horaFinalizacion)}}</p>
+        <p><strong>Tiempo Firma:</strong> {{firma.tiempoFirma || '—'}}</p>
+        <p><strong>Emisor:</strong> {{firma.Emisor || '—'}}</p>
+        <p><strong>Estado:</strong> {{firma.Estado || '—'}}</p>
+        <p><strong>Usuario Fin:</strong> {{firma.codUserF || '—'}}</p>
+        <p><strong>Comentario:</strong> {{firma.Comentario || '—'}}</p>
+        <p><strong>Periodo:</strong> {{firma.periodo || '—'}}</p>
+        <p><strong>Clave:</strong> {{firma.clave || '—'}}</p>
+        <p><strong>Correo3:</strong> {{firma.correo3 || '—'}}</p>
+        <p><strong>Creación Clave:</strong> {{firma.creacionClave || '—'}}</p>
+        <p><strong>Notificado:</strong> {{firma.notificado || '—'}}</p>
+        <p><strong>Tipo P:</strong> {{firma.tipoP || '—'}}</p>
+        <p><strong>Comprobante:</strong> {{firma.comprobante || '—'}}</p>
+        <p><strong>Recurrencia:</strong> {{firma.recurrencia || '—'}}</p>
+        <p><strong>Código Factura:</strong> {{firma.codigo_factura || '—'}}</p>
+        <p><strong>Número Factura:</strong> {{firma.numero_factura || '—'}}</p>
+        <p><strong>Identificación Factura:</strong> {{firma.identificacion_factura || '—'}}</p>
+        <p><strong>Empresa Distribuidor:</strong> {{firma.empresa_distribuidor || '—'}}</p>
+      </ng-container>
+
+      <ng-container *ngIf="tipoBusqueda === 'filtro_distribuidores'">
+        <p><strong>Fecha Registro:</strong> {{formatearFechaHora(firma.fecha_registro)}}</p>
+        <p><strong>Código Distribuidor:</strong> {{firma.codigo_distribuidor || '—'}}</p>
+        <p><strong>RUC Distribuidor:</strong> {{firma.ruc_distribuidor || '—'}}</p>
+        <p><strong>Nombre Distribuidor:</strong> {{firma.nombre_distribuidor || '—'}}</p>
+        <p><strong>Dirección Distribuidor:</strong> {{firma.direccion_distribuidor || '—'}}</p>
+        <p><strong>Teléfono Distribuidor:</strong> {{firma.telefoo_distribuidor || '—'}}</p>
+        <p><strong>Cantidad Vendida:</strong> {{firma.cant_vendida || 0}}</p>
+        <p><strong>RUC Enganchador:</strong> {{firma.ruc_enganchador || '—'}}</p>
+        <p><strong>Nombre Enganchador:</strong> {{firma.nombre_enganchador || '—'}}</p>
+      </ng-container>
+
       <ng-container *ngIf="tipoBusqueda === 'firmas_caducar'">
         <p><strong>Cédula:</strong> {{firma.cedula || '—'}}</p>
         <p><strong>Razón Social:</strong> {{firma.razon_social || '—'}}</p>
@@ -63,10 +228,32 @@
     </div>
   </div>
 
-  <!-- Paginación -->
-  <div id="paginacion" class="paginacion" [style.display]="mostrarPaginacion ? 'flex' : 'none'">
-    <button (click)="cambiarPagina(-1)" [disabled]="pagina === 1">Anterior</button>
-    <span>{{pagina}}</span> / <span>{{totalPaginas}}</span>
-    <button (click)="cambiarPagina(1)" [disabled]="pagina === totalPaginas">Siguiente</button>
+  <!-- ===== PAGINACIÓN ===== -->
+  <div id="paginacion" class="paginacion" *ngIf="mostrarPaginacion">
+    <div class="pagina-info">Página {{pagina}} de {{totalPaginas}} — Mostrando {{startIndex}} - {{endIndex}} de {{totalResults}}</div>
+    <div class="pagina-controles">
+      <button class="btn" [disabled]="pagina<=1" (click)="cambiarPagina(-1)">Anterior</button>
+      <button class="btn" [disabled]="pagina>=totalPaginas" (click)="cambiarPagina(1)">Siguiente</button>
+    </div>
   </div>
+
 </div>
+
+  <!-- Modal de confirmación / cargando -->
+  <div class="modal-overlay" *ngIf="showConfirmModal">
+    <div class="modal-card">
+      <div class="modal-icon">⚠️</div>
+      <!-- Cuando está cargando, mostramos título/spinner; si no, mostramos el mensaje -->
+      <h3 class="modal-title" *ngIf="modalLoading">Espere, sus datos se están cargando...</h3>
+      <div class="modal-spinner" *ngIf="modalLoading">⏳</div>
+
+      <div class="modal-message" *ngIf="!modalLoading">
+        <p>{{ modalMessage }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" (click)="cancelLoad()">Cancelar</button>
+        <button class="btn modal-ok" *ngIf="!modalLoading" (click)="confirmLoad()">OK</button>
+      </div>
+    </div>
+  </div>
